@@ -58,3 +58,5 @@
 cd Python_SCADA
 pip install pymodbus
 python pendulum_monitor.py
+
+**极限内存压缩与水位线测绘 (Memory Profiling)**：针对 STM32F103 有限的 20KB SRAM，利用 FreeRTOS 的 `uxTaskGetStackHighWaterMark` API 对所有并发任务进行极限压力下的历史最低水位线测绘。成功剥离了因经验评估导致的栈空间分配浪费，将各核心任务的安全缓冲带精准锁定在 40~60 Words，累计为系统释放超 5KB 的冗余物理内存，极大提升了系统未来扩展队列与信号量的潜力。
