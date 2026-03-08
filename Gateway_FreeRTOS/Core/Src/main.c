@@ -59,21 +59,21 @@ UART_HandleTypeDef huart2;
 osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
   .name = "defaultTask",
-  .stack_size = 1024 * 4,
+  .stack_size = 186 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
 /* Definitions for SensorTask */
 osThreadId_t SensorTaskHandle;
 const osThreadAttr_t SensorTask_attributes = {
   .name = "SensorTask",
-  .stack_size = 256 * 4,
+  .stack_size = 100 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for ModbusTask */
 osThreadId_t ModbusTaskHandle;
 const osThreadAttr_t ModbusTask_attributes = {
   .name = "ModbusTask",
-  .stack_size = 256 * 4,
+  .stack_size = 100 * 4,
   .priority = (osPriority_t) osPriorityAboveNormal,
 };
 /* USER CODE BEGIN PV */
@@ -82,6 +82,9 @@ QueueHandle_t g_xQueue;
 SemaphoreHandle_t g_xMutex;
 SemaphoreHandle_t g_Modbus_Rx_Sem;
 SemaphoreHandle_t g_xUpdateTrigger;
+volatile UBaseType_t g_defaultTask_WaterMark = 0;
+volatile UBaseType_t g_SensorTask_WaterMark = 0;
+volatile UBaseType_t g_ModbusTask_WaterMark = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -573,6 +576,8 @@ void StartDefaultTask(void *argument)
       sprintf(disp_buf, "Kp:%-6d", local_kp);
       OLED_PrintString(0, 6, disp_buf);
 
+      g_defaultTask_WaterMark = uxTaskGetStackHighWaterMark(NULL);
+      vTaskDelay(pdMS_TO_TICKS(10));
     } 
     else {
       HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);  // LED 闪烁证明活着
@@ -631,8 +636,8 @@ void Sensor_Ctrl_Task(void *argument)
 
       HAL_UART_Transmit(&huart2, tx_frame, 20, 100);
     }
-
-    vTaskDelay(100);
+    g_SensorTask_WaterMark = uxTaskGetStackHighWaterMark(NULL);
+    vTaskDelay(pdMS_TO_TICKS(10));
   }
   /* USER CODE END Sensor_Ctrl_Task */
 }
@@ -659,6 +664,8 @@ void Modbus_Task(void *argument)
       rx_len = 0;
       mb_state = MB_STATE_IDLE;
     }
+    g_ModbusTask_WaterMark = uxTaskGetStackHighWaterMark(NULL);
+    vTaskDelay(pdMS_TO_TICKS(10));
   }
   /* USER CODE END Modbus_Task */
 }

@@ -251,6 +251,10 @@ void USART1_IRQHandler(void)
 void USART2_IRQHandler(void)
 {
   /* USER CODE BEGIN USART2_IRQn 0 */
+  if(__HAL_UART_GET_FLAG(&huart2, UART_FLAG_ORE) != RESET) {
+      __HAL_UART_CLEAR_OREFLAG(&huart2); // 清除错误标志
+      huart2.Instance->DR;               // 读一次 DR 寄存器，彻底恢复硬件状态
+  }
   
   // 检查是否是“RXNE”中断
   if(__HAL_UART_GET_FLAG(&huart2, UART_FLAG_RXNE) != RESET) {
