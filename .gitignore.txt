@@ -1,0 +1,22 @@
+# Keil / ARM MDK
+*.o
+*.d
+*.crf
+*.lst
+*.bak
+*.dep
+*.uvguix.*
+*.uvoptx
+Objects/
+Listings/
+
+# STM32CubeIDE / Eclipse
+Debug/
+Release/
+.metadata/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
