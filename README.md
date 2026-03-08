@@ -15,6 +15,7 @@
 * **微秒级高速串口状态机**：摒弃低效的阻塞式任务轮询，下沉至 `RXNE` 硬件中断直读 `DR` 寄存器；配合 `ORE` (Overrun Error) 溢出防御与错误清除，实现 50ms 密集通信下的零丢包与绝对防锁死。
 * **FreeRTOS 高可靠并发**：采用 `中断解析 -> 队列 (Queue) 投递 -> 任务互斥锁 (Mutex) 更新` 的空间隔离设计，彻底消除 ISR 阻塞、任务抢占引发的内核断言崩溃 (HardFault) 与数据撕裂 (Data Tearing)。
 * **跨平台 SCADA 交互终端**：基于 Python 多线程架构实现无阻塞的实时数据流监控，提供类似 Linux 终端的命令行交互界面，支持毫秒级状态同步与不停机 PID 参数下发。
+* **极限内存压缩与水位线测绘 (Memory Profiling)**：针对 STM32F103 有限的 20KB SRAM，利用 FreeRTOS 的 `uxTaskGetStackHighWaterMark` API 对所有并发任务进行极限压力下的历史最低水位线测绘。成功剥离了因经验评估导致的栈空间分配浪费，将各核心任务的安全缓冲带精准锁定在 40~60 Words，累计为系统释放超 5KB 的冗余物理内存，极大提升了系统未来扩展队列与信号量的潜力。
 
 ---
 
@@ -58,5 +59,3 @@
 cd Python_SCADA
 pip install pymodbus
 python pendulum_monitor.py
-
-**极限内存压缩与水位线测绘 (Memory Profiling)**：针对 STM32F103 有限的 20KB SRAM，利用 FreeRTOS 的 `uxTaskGetStackHighWaterMark` API 对所有并发任务进行极限压力下的历史最低水位线测绘。成功剥离了因经验评估导致的栈空间分配浪费，将各核心任务的安全缓冲带精准锁定在 40~60 Words，累计为系统释放超 5KB 的冗余物理内存，极大提升了系统未来扩展队列与信号量的潜力。
