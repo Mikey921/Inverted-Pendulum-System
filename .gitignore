@@ -20,3 +20,12 @@ __pycache__/
 *.py[cod]
 *$py.class
 .venv/
+
+# CMake
+build/
+bin/
+CMakeFiles/
+CMakeCache.txt
+CMakeLists.txt.user
+compile_commands.json
+*.cmake
